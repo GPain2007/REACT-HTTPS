@@ -8,17 +8,22 @@ import AvailablePlaces from "./components/AvailablePlaces.jsx";
 import { updateUserPlaces } from "./http.js";
 import { fetchUserPlaces } from "./http.js";
 import Error from "./components/Error.jsx";
+import { useFetch } from "./hooks/useFetch.js";
 
 function App() {
   const selectedPlace = useRef();
+  const {
+    error,
+    isFetching,
+    fetchedData: userPlaces,
+    setFetchedData: setUserPlaces,
+    setIsFetching,
+  } = useFetch(fetchUserPlaces, []);
 
-  const [userPlaces, setUserPlaces] = useState([]);
+  // const [userPlaces, setUserPlaces] = useState([]);
   const [errorUpateUserPlaces, setErrorUpdateUserPlaces] = useState();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
-
-  const [error, setError] = useState();
 
   useEffect(() => {
     async function fetchPlaces() {
