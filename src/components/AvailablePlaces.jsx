@@ -3,24 +3,31 @@ import { useState, useEffect } from "react";
 import Places from "./Places.jsx";
 
 const places = localStorage.getItem("places");
+import Error from "./Error.jsx";
+import { sortPlacesByDistance } from "../loc.js";
+import { fetchAvailablePlaces } from "../http.js";
 
 export default function AvailablePlaces({ onSelectPlace }) {
   const [isFetching, setIsFetching] = useState(false);
   const [availablePlaces, setAvailablePlaces] = useState([]);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState();
 
   useEffect(() => {
     async function fetchPlaces() {
       setIsFetching(true);
       try {
-        const response = await fetch("http://localhost:3000/places");
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error("Something went wrong");
-        }
-        setAvailablePlaces(data.places);
+        const places = await fetchAvailablePlaces();
+        navigator.geolocation.getCurrentPosition((position) => {
+          const sortedPlaces = sortPlacesByDistance(
+            places,
+            position.coords.latitude,
+            position.coords.longitude
+          );
+          setAvailablePlaces(sortedPlaces);
+          setIsFetching(false);
+        });
       } catch (error) {
-        setError(error.message);
+        setError({ message: error.message || "Something went wrong" });
       }
 
       setIsFetching(false);
@@ -36,13 +43,7 @@ export default function AvailablePlaces({ onSelectPlace }) {
   }, []);
 
   if (error) {
-    return (
-      <Error
-        title="Error"
-        message={error.message}
-        onConfirm={() => setError(null)}
-      />
-    );
+    return <Error title="Error" message={error.message} />;
   }
 
   return (
