@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback } from "react";
 
 import Places from "./components/Places.jsx";
 import Modal from "./components/Modal.jsx";
@@ -20,27 +20,9 @@ function App() {
     setIsFetching,
   } = useFetch(fetchUserPlaces, []);
 
-  // const [userPlaces, setUserPlaces] = useState([]);
   const [errorUpateUserPlaces, setErrorUpdateUserPlaces] = useState();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-
-  useEffect(() => {
-    async function fetchPlaces() {
-      setIsFetching(true);
-      try {
-        const places = await fetchUserPlaces();
-        setUserPlaces(places);
-      } catch (error) {
-        setError({
-          message: error.message || "Something went wrong",
-        });
-      }
-      setIsFetching(false);
-    }
-
-    fetchPlaces();
-  }, []);
 
   function handleStartRemovePlace(place) {
     setModalIsOpen(true);
